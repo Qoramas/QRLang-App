@@ -1,4 +1,4 @@
-package qor.qrlang;
+package qor.qrlang.tests;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

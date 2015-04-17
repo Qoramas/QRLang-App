@@ -14,6 +14,8 @@ public class Decompressor {
             {";Android.write(", "WR"},
             {"Android.key('up')", "keyup"},
             {"Android.key('down')", "keydown"},
+            {"Android.key('left')", "keyleft"},
+            {"Android.key('right')", "keyright"},
             {";Android.log(", "LG"},
             {"new Array(", "AR"},
             {";draw = function(){", "DR"},
@@ -65,6 +67,21 @@ public class Decompressor {
 
     //Decompresses given code to valid javascript code
     public String decompress(String code){
+
+
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 $:%*+-=./";
+        for(int i = 0; i < code.length(); i++){
+            if(!characters.contains(code.substring(i,i+1))){
+                return error("INVALID CHARACTER");
+            }
+        }
+
+        if(!code.contains("DR")){
+            return error("NO DRAW METHOD");
+        } else if(!code.contains("UP")){
+            return error("NO UPDATE METHOD");
+        }
+
         code = code.replace("QS","'");
 
         ArrayList<String> quotes = getQuotes(code);
@@ -79,7 +96,20 @@ public class Decompressor {
         code = replaceSpecialCharacters(code);
         code = replaceQuotes(code, quotes);
 
+        if(countOccurances("{", code) != countOccurances("}", code)){
+            return error("MISSING CURLY BRACKET");
+        } else if(countOccurances("(", code) != countOccurances(")", code)){
+            return error("MISSING BRACKET");
+        }
+
         return code;
+    }
+
+    private String error(String message){
+        String errorBefore = " ;draw = function(){ ;Android.write('";
+        String errorAfter = "',10,10,7) }\n ;update = function(){ }\n";
+
+        return errorBefore + message + errorAfter;
     }
 
     //Replaces the quote back into the code
@@ -121,6 +151,15 @@ public class Decompressor {
         }
 
         return code;
+    }
+
+    public static int countOccurances(String c, String input) {
+        Matcher m = Pattern.compile(Pattern.quote(c)).matcher(input);
+        int count = 0;
+        while (m.find()) {
+            count++;
+        }
+        return count;
     }
 
 }

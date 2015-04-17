@@ -132,6 +132,8 @@ public class QRLangView extends SurfaceView  implements SurfaceHolder.Callback, 
 
         if(k.equals("up")) return event.getY() < 360;
         if(k.equals("down")) return event.getY() > 360;
+        if(k.equals("left")) return event.getX() < 640;
+        if(k.equals("right")) return event.getX() > 640;
 
         return false;
     }
